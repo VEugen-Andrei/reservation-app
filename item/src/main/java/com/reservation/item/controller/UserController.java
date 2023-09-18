@@ -2,6 +2,7 @@ package com.reservation.item.controller;
 
 import com.reservation.item.entity.User;
 import com.reservation.item.helper.ExceptionHelper;
+import com.reservation.item.model.ExternalUser;
 import com.reservation.item.model.ProductDto;
 import com.reservation.item.model.UserDto;
 import com.reservation.item.service.ProductService;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -97,5 +99,29 @@ public class UserController {
             return ResponseEntity.ok(userDto);
         }
         return new ResponseEntity<>(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));
+    }
+
+    @GetMapping("/populate")
+    public ResponseEntity<?> populateUsers() {
+        String url = "https://jsonplaceholder.typicode.com/users";
+        RestTemplate restTemplate = new RestTemplate();
+        ExternalUser[] externalUsers = restTemplate.getForObject(url, ExternalUser[].class);
+
+        if (externalUsers != null) {
+            for (ExternalUser externalUser : externalUsers) {
+                User user = new User();
+                user.setEmail(externalUser.getEmail());
+
+                String newName = externalUser.getName().replace("Mrs. ", "").replace(" V", "");
+                String[] splits = newName.split(" ");
+                user.setFirstName(splits[0]);
+                user.setLastName(splits[1]);
+                user.setPassword("12345");
+
+                userService.addUser(user);
+            }
+        }
+
+        return ResponseEntity.ok(externalUsers);
     }
 }

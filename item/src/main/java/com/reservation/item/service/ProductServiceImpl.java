@@ -98,10 +98,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDto> findTop5ByOrderByPriceDesc() {
-        return productRepository.findTop5ByOrderByPriceDesc().stream().map(product -> {
-            ProductDto productDto = new ProductDto();
-            MapEntity.mapProductToProductDto(product, productDto);
-            return productDto;
-        }).toList();
+        return productRepository.findTop5ByOrderByPriceDesc()
+                .stream()
+                .map(product -> {
+                    ProductDto productDto = new ProductDto();
+                    MapEntity.mapProductToProductDto(product, productDto);
+                    return productDto;
+                }).toList();
     }
 }

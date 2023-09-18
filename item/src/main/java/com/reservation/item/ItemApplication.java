@@ -11,11 +11,5 @@ public class ItemApplication {
 		SpringApplication.run(ItemApplication.class, args);
 	}
 
-	User user = User
-			.builder()
-			.firstName("Test")
-			.lastName("Test2")
-			.password("123123")
-			.build();
 
 }
