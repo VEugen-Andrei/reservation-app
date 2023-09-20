@@ -22,4 +22,6 @@ public interface ProductService {
     public List<ProductDto> findProductsByAddedDateBetween(Date startDate, Date endDate); //Interval
 
     public List<ProductDto> findTop5ByOrderByPriceDesc();
+
+
 }

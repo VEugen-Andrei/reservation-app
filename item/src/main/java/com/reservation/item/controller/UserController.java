@@ -1,12 +1,17 @@
 package com.reservation.item.controller;
 
+import com.github.javafaker.Faker;
 import com.reservation.item.entity.User;
 import com.reservation.item.helper.ExceptionHelper;
 import com.reservation.item.model.ExternalUser;
+import com.reservation.item.model.GetUsersResponse;
 import com.reservation.item.model.ProductDto;
 import com.reservation.item.model.UserDto;
 import com.reservation.item.service.ProductService;
 import com.reservation.item.service.UserService;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,24 +25,28 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 //application programming interface
+
 @RestController()
 @RequestMapping("/api/v1/users")
-//@AllArgsConstructor
+
 public class UserController {
 
-    private final UserService userService;
-    private final ProductService productService;
-    private final Logger logger = LoggerFactory.getLogger(UserController.class); //reflection
 
-    @Autowired
-    public UserController(UserService userService, ProductService productService) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.productService = productService;
+
     }
 
+    private final UserService userService;
+    private final Logger logger = LoggerFactory.getLogger(UserController.class); //reflection
+
+
     @GetMapping()
-    public ResponseEntity<List<UserDto>> getUsers() {
-        return ResponseEntity.ok(userService.getUsers());
+    public ResponseEntity<GetUsersResponse> getUsers() {
+        List<UserDto> users = userService.getUsers();
+        int count = users.size();
+        GetUsersResponse usersResponse = new GetUsersResponse(users, count);
+        return ResponseEntity.ok(usersResponse);
     }
 
     @GetMapping("/{id}")
@@ -94,7 +103,7 @@ public class UserController {
 
     @PostMapping("/{userId}/addProduct/{productId}")
     public ResponseEntity<?> addProductsToUser(@PathVariable Long userId, @PathVariable Long productId) {
-        UserDto userDto = userService.addProductToUser(userId, productId);
+        UserDto userDto = userService.addProductsToUser(userId, productId);
         if (userDto != null) {
             return ResponseEntity.ok(userDto);
         }
@@ -102,26 +111,62 @@ public class UserController {
     }
 
     @GetMapping("/populate")
-    public ResponseEntity<?> populateUsers() {
+    public ResponseEntity<?> populateUsers(){
         String url = "https://jsonplaceholder.typicode.com/users";
         RestTemplate restTemplate = new RestTemplate();
-        ExternalUser[] externalUsers = restTemplate.getForObject(url, ExternalUser[].class);
+        ExternalUser[]  externalUsers = restTemplate.getForObject(url, ExternalUser[].class);
 
-        if (externalUsers != null) {
-            for (ExternalUser externalUser : externalUsers) {
-                User user = new User();
-                user.setEmail(externalUser.getEmail());
+        for (ExternalUser externalUser : externalUsers){
+            User user = new User();
+            user.setEmail(externalUser.getEmail());
 
-                String newName = externalUser.getName().replace("Mrs. ", "").replace(" V", "");
-                String[] splits = newName.split(" ");
-                user.setFirstName(splits[0]);
-                user.setLastName(splits[1]);
-                user.setPassword("12345");
+            String newName = externalUser.getName().replace("Mrs. ", "").replace( " V", "");
+            String[] splits = newName.split(" ");
+            user.setFirstName(splits[0]);
+            user.setLastName(splits[1]);
+            user.setPassword("12345");
 
-                userService.addUser(user);
-            }
+            userService.addUser(user);
         }
 
         return ResponseEntity.ok(externalUsers);
+    }
+
+    @GetMapping("/populate10k")
+    public ResponseEntity<?> populate10kUsers(){
+//        String url = "https://jsonplaceholder.typicode.com/users";
+//        RestTemplate restTemplate = new RestTemplate();
+//        ExternalUser[]  externalUsers = restTemplate.getForObject(url, ExternalUser[].class);
+
+        for (int i=0; i<4000; i++) {
+            User user = new User();
+            Faker faker = new Faker();
+            String firstName = faker.name().firstName();
+            String lastName = faker.name().lastName();
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            user.setEmail(firstName + "." + lastName + "@mailnator.com");
+
+//            user.setFirstName("first" + i);
+//            user.setLastName("last" + i);
+//            user.setEmail("last" + i + "@gmail.com");
+            user.setPassword("12345");
+            userService.addUser(user);
+        }
+
+//        for (ExternalUser externalUser : externalUsers){
+//            User user = new User();
+//            user.setEmail(externalUser.getEmail());
+//
+//            String newName = externalUser.getName().replace("Mrs. ", "").replace( " V", "");
+//            String[] splits = newName.split(" ");
+//            user.setFirstName(splits[0]);
+//            user.setLastName(splits[1]);
+//            user.setPassword("12345");
+//
+//            userService.addUser(user);
+//        }
+
+        return new ResponseEntity<>(HttpStatusCode.valueOf(HttpStatus.OK.value()));
     }
 }

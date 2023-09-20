@@ -9,8 +9,9 @@ public interface UserService {
     public List<UserDto> getUsers();
     public UserDto getUserById(Long id);
     public UserDto addUser(User user);
-    public UserDto addProductToUser(Long userId, Long productId);
     public UserDto updateUser(Long id, User user);
     public UserDto deleteUser(Long id);
     public void deleteAll();
+
+    public UserDto addProductsToUser (Long id, Long productId);
 }

@@ -15,6 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class Product {
 
     @Id
@@ -33,6 +34,7 @@ public class Product {
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
+
 
     @Column(name = "added_date", nullable = false, updatable = false)
     private Date addedDate = new Date();

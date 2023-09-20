@@ -1,11 +1,18 @@
 package com.reservation.item.service;
 
+import com.github.javafaker.Faker;
 import com.reservation.item.entity.Product;
 import com.reservation.item.helper.MapEntity;
 import com.reservation.item.model.ProductDto;
 import com.reservation.item.repository.ProductRepository;
+import org.hibernate.engine.spi.Resolution;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.Date;
 import java.util.List;
@@ -23,6 +30,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable("products")
     public List<ProductDto> getProducts() {
         return productRepository.findAll().stream().map(product -> {
             ProductDto productDto = new ProductDto();
@@ -32,6 +40,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "product", key = "#product.id") })
     public ProductDto addProduct(Product product) {
         productRepository.save(product);
         ProductDto productDto = new ProductDto();
@@ -40,6 +51,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable("product")
     public ProductDto getProductById(Long id) {
         Optional<Product> foundProduct = productRepository.findById(id);
         if (foundProduct.isPresent()) {
@@ -51,6 +63,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "product", key = "#id") })
     public ProductDto updateProduct(Long id, Product product) {
         Optional<Product> productFound = productRepository.findById(id);
         if (productFound.isPresent()) {
@@ -67,9 +82,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "product", key = "#id") })
     public ProductDto deleteProduct(Long id) {
         Optional<Product> product = productRepository.findById(id);
-        if (product.isPresent()) {
+        if(product.isPresent()){
             productRepository.deleteById(id);
             ProductDto productDto = new ProductDto();
             MapEntity.mapProductToProductDto(product.get(), productDto);
@@ -80,6 +98,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CacheEvict(value = "products", allEntries = true)
     public void deleteAll() {
         productRepository.deleteAll();
 
@@ -106,4 +125,9 @@ public class ProductServiceImpl implements ProductService {
                     return productDto;
                 }).toList();
     }
+
+
+
+
+
 }

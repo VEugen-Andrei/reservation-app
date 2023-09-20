@@ -3,17 +3,22 @@ package com.reservation.item.service;
 import com.reservation.item.entity.Product;
 import com.reservation.item.entity.User;
 import com.reservation.item.helper.MapEntity;
-import com.reservation.item.model.ProductDto;
 import com.reservation.item.model.UserDto;
 import com.reservation.item.repository.ProductRepository;
 import com.reservation.item.repository.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@EnableCaching
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -26,6 +31,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable("users")
     public List<UserDto> getUsers() {
         return userRepository.findAll().stream().map(user -> {
             UserDto userDto = new UserDto();
@@ -35,6 +41,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable("user")
     public UserDto getUserById(Long id) {
         Optional<User> foundUser = userRepository.findById(id);
         if (foundUser.isPresent()) {
@@ -46,6 +53,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "users", allEntries = true),
+            @CacheEvict(value = "user", key = "#user.id") })
     public UserDto addUser(User user) {
         userRepository.save(user);
         UserDto userDto = new UserDto();
@@ -54,29 +64,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto addProductToUser(Long userId, Long productId) {
-        Optional<User> user = userRepository.findById(userId);
-        Optional<Product> product = productRepository.findById(productId);
-
-        if (user.isPresent() && product.isPresent()) {
-            User foundUser = user.get();
-            Product foundProduct = product.get();
-            List<Product> products = foundUser.getProducts();
-            products.add(foundProduct);
-            foundUser.setProducts(products);
-            userRepository.save(foundUser);
-
-            //mapping
-            UserDto userDto = new UserDto();
-            MapEntity.mapUserToUserDto(foundUser, userDto);
-
-            return userDto;
-        }
-
-        return null;
-    }
-
-    @Override
+    @Caching(evict = {
+            @CacheEvict(value = "users", allEntries = true),
+            @CacheEvict(value = "user", key = "#id") })
     public UserDto updateUser(Long id, User user) {
         Optional<User> userFound = userRepository.findById(id);
         if (userFound.isPresent()) {
@@ -93,6 +83,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "users", allEntries = true),
+            @CacheEvict(value = "user", key = "#id") })
     public UserDto deleteUser(Long id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
@@ -105,9 +98,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(value = "users", allEntries = true)
     public void deleteAll() {
         userRepository.deleteAll();
     }
 
+    @Override
+    public UserDto addProductsToUser(Long userId, Long productId) {
+        Optional<User> user = userRepository.findById(userId);
+        Optional<Product> product = productRepository.findById(productId);
 
+        if (user.isPresent() && product.isPresent()) {
+            User foundUser = user.get();
+            Product foundProduct = product.get();
+            List<Product> products = foundUser.getProducts();
+            products.add(foundProduct);
+            foundUser.setProducts(products);
+            userRepository.save(foundUser);
+
+            UserDto userDto = new UserDto();
+            MapEntity.mapUserToUserDto(foundUser, userDto);
+
+            return userDto;
+        }
+        return null;
+    }
 }
