@@ -9,7 +9,7 @@ import { UserResponse } from '../types/userResponse';
 })
 export class UserService {
 
-  private url: string = "https://localhost:443/api/v1/users";
+  private url: string = "http://localhost:9090/api/v1/users";
   users!: User[];
 
   // cache

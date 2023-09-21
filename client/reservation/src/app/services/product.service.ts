@@ -9,7 +9,7 @@ import { ProductResponse } from '../types/productResponse';
 })
 export class ProductService {
 
-  private url: string = "https://localhost:443/api/v1/products";
+  private url: string = "http://localhost:9090/api/v1/products";
   products!: Product[];
 
 

@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @RequiredArgsConstructor
@@ -41,4 +43,20 @@ public class ApplicationConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
+
+//    @Bean
+//    public WebMvcConfigurer corsMappingConfigurer() {
+//        return new WebMvcConfigurer() {
+//            @Override
+//            public void addCorsMappings(CorsRegistry registry) {
+//                WebConfigProperties.Cors cors = webConfigProperties.getCors();
+//                registry.addMapping("/**")
+//                        .allowedOrigins(cors.getAllowedOrigins())
+//                        .allowedMethods(cors.getAllowedMethods())
+//                        .maxAge(cors.getMaxAge())
+//                        .allowedHeaders(cors.getAllowedHeaders())
+//                        .exposedHeaders(cors.getExposedHeaders());
+//            }
+//        };
+//    }
 }

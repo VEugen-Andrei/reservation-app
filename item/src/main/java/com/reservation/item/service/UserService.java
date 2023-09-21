@@ -6,12 +6,11 @@ import com.reservation.item.model.UserDto;
 import java.util.List;
 
 public interface UserService {
-    public List<UserDto> getUsers();
-    public UserDto getUserById(Long id);
-    public UserDto addUser(User user);
-    public UserDto updateUser(Long id, User user);
-    public UserDto deleteUser(Long id);
-    public void deleteAll();
-
-    public UserDto addProductsToUser (Long id, Long productId);
+    List<UserDto> getUsers();
+     UserDto getUserById(Long id);
+     UserDto addUser(User user);
+     UserDto updateUser(Long id, User user);
+     UserDto deleteUser(Long id);
+     void deleteAll();
+     UserDto addProductsToUser (Long id, Long productId);
 }

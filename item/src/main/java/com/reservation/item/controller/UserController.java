@@ -5,16 +5,10 @@ import com.reservation.item.entity.User;
 import com.reservation.item.helper.ExceptionHelper;
 import com.reservation.item.model.ExternalUser;
 import com.reservation.item.model.GetUsersResponse;
-import com.reservation.item.model.ProductDto;
 import com.reservation.item.model.UserDto;
-import com.reservation.item.service.ProductService;
 import com.reservation.item.service.UserService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +22,7 @@ import java.util.List;
 
 @RestController()
 @RequestMapping("/api/v1/users")
-
+@CrossOrigin("*")
 public class UserController {
 
 
@@ -134,9 +128,6 @@ public class UserController {
 
     @GetMapping("/populate10k")
     public ResponseEntity<?> populate10kUsers(){
-//        String url = "https://jsonplaceholder.typicode.com/users";
-//        RestTemplate restTemplate = new RestTemplate();
-//        ExternalUser[]  externalUsers = restTemplate.getForObject(url, ExternalUser[].class);
 
         for (int i=0; i<4000; i++) {
             User user = new User();
@@ -147,26 +138,9 @@ public class UserController {
             user.setLastName(lastName);
             user.setEmail(firstName + "." + lastName + "@mailnator.com");
 
-//            user.setFirstName("first" + i);
-//            user.setLastName("last" + i);
-//            user.setEmail("last" + i + "@gmail.com");
             user.setPassword("12345");
             userService.addUser(user);
         }
-
-//        for (ExternalUser externalUser : externalUsers){
-//            User user = new User();
-//            user.setEmail(externalUser.getEmail());
-//
-//            String newName = externalUser.getName().replace("Mrs. ", "").replace( " V", "");
-//            String[] splits = newName.split(" ");
-//            user.setFirstName(splits[0]);
-//            user.setLastName(splits[1]);
-//            user.setPassword("12345");
-//
-//            userService.addUser(user);
-//        }
-
-        return new ResponseEntity<>(HttpStatusCode.valueOf(HttpStatus.OK.value()));
+                return new ResponseEntity<>(HttpStatusCode.valueOf(HttpStatus.OK.value()));
     }
 }

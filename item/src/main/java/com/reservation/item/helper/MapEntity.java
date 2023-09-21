@@ -30,7 +30,6 @@ public class MapEntity {
         user.setLastName(userDTO.getLastName());
         user.setPassword(userDTO.getPassword());
         user.setEmail(userDTO.getEmail());
-      //  user.setProducts(userDTO.getProducts());
     }
 
     public static void mapProductProperties(Product initialProduct, Product product) {
