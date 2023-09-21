@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
+//@CrossOrigin("*")
 @RequestMapping("/api/v1/products")
 public class ProductController {
 

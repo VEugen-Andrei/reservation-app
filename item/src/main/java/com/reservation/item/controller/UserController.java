@@ -22,7 +22,7 @@ import java.util.List;
 
 @RestController()
 @RequestMapping("/api/v1/users")
-@CrossOrigin("*")
+//@CrossOrigin("*")
 public class UserController {
 
 

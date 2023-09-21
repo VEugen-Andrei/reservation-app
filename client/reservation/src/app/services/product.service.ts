@@ -5,18 +5,17 @@ import { Observable } from 'rxjs';
 import { ProductResponse } from '../types/productResponse';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ProductService {
-
-  private url: string = "http://localhost:9090/api/v1/products";
+  private url: string = 'https://localhost:443/api/v1/products';
   products!: Product[];
 
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getProducts(): Observable<ProductResponse> {
-    
-    return this.http.get<ProductResponse>(this.url)
+    return this.http.get<ProductResponse>(this.url);
   }
+
+  // addProducts():
 }

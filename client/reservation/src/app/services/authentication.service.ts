@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const AUTH_API = 'http://localhost:9090/api/auth/';
+const AUTH_API = 'https://localhost:443/api/v1/auth/';
 
 const httpOptions = {
-  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
 };
 
 @Injectable({
@@ -25,7 +25,12 @@ export class AuthService {
     );
   }
 
-  register(firstname: string, lastname: string, email: string, password: string): Observable<any> {
+  register(
+    firstname: string,
+    lastname: string,
+    email: string,
+    password: string
+  ): Observable<any> {
     return this.http.post(
       AUTH_API + 'register',
       {
@@ -34,11 +39,11 @@ export class AuthService {
         email,
         password,
       },
-      // httpOptions
+      httpOptions
     );
   }
 
   logout(): Observable<any> {
-    return this.http.post(AUTH_API + 'signout', { }, httpOptions);
+    return this.http.post(AUTH_API + 'signout', {}, httpOptions);
   }
 }
